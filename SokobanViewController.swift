@@ -28,6 +28,7 @@ class SokobanViewController: UIViewController {
     
     @IBOutlet weak var buttonOptions: UIButton!
     
+    @IBOutlet weak var buttonContinue: UIButton!
 
     @IBOutlet weak var buttonSave: UIButton!
     
@@ -69,13 +70,14 @@ class SokobanViewController: UIViewController {
             let translate = CGAffineTransform(translationX: 0, y: 0)
             self.fieldView.transform = scale.concatenating(translate)
         })
+        print("field animation completed")
         
     }
 
     
     
     @IBAction func tapRestart(_ sender: UIButton) {
-        blurView.isHidden = true
+        hideBlurView()
         print("restart level")
         sokobanGame = storage.initialField.copy() as! Field
         storage.deleteStates()
@@ -83,7 +85,7 @@ class SokobanViewController: UIViewController {
 
     }
     @IBAction func tapSave(_ sender: UIButton) {
-        blurView.isHidden = true
+        hideBlurView()
         
         var saves = NSKeyedUnarchiver.unarchiveObject(withFile: SokobanData.getLevelPath(name: "saves")) as? [String]
         
@@ -110,8 +112,15 @@ class SokobanViewController: UIViewController {
         
     }
 
+    @IBAction func tapContinue(_ sender: UIButton) {
+        
+        hideBlurView()
+
+        print("tapped to continue playing")
+    }
+    
     @IBAction func tapExit(_ sender: UIButton) {
-        blurView.isHidden = true
+        print("tapped Exit")
     }
     
     @IBAction func tapNextLevel(_ sender: UIButton) {
@@ -138,9 +147,30 @@ class SokobanViewController: UIViewController {
         showGame()
     }
     
+    
+    func showBlurView() {
+        let translate = CGAffineTransform(translationX: 375, y: 0)
+        self.blurView.transform = translate
+        self.blurView.isHidden = false
+
+        UIView.animate(withDuration: 0.5, animations: { () -> Void in
+            let translate = CGAffineTransform(translationX: 0, y: 0)
+            self.blurView.transform = translate
+        })
+    }
+    
+    
+    func hideBlurView() {
+
+        UIView.animate(withDuration: 0.5, animations: { () -> Void in
+            let translate = CGAffineTransform(translationX: 375, y: 0)
+            self.blurView.transform = translate
+        })
+    }
+    
     @IBAction func tapOptions(_ sender: UIButton) {
         
-        blurView.isHidden = false
+        showBlurView()
         
         
         /*let blurView = UIView(frame: self.mainView.frame)

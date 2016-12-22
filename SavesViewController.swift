@@ -13,6 +13,7 @@ class SavesViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var deleteButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var hintTextField: UITextField!
     
     var savedLevels: [SokobanData]! = []
     var levels: [SokobanData]!
@@ -123,6 +124,11 @@ class SavesViewController: UIViewController, UIScrollViewDelegate {
         let pageWidth = scrollView.frame.size.width
         let page = Int(floor((scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1)
         currentIndex = page
+        if currentIndex > 0 {
+            hintTextField.isHidden = true
+        } else {
+            hintTextField.isHidden = false
+        }
         
     }
     
