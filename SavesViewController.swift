@@ -10,6 +10,7 @@ import UIKit
 
 class SavesViewController: UIViewController, UIScrollViewDelegate {
 
+    @IBOutlet weak var loadButton: UIButton!
     @IBOutlet weak var deleteButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var scrollView: UIScrollView!
@@ -19,35 +20,43 @@ class SavesViewController: UIViewController, UIScrollViewDelegate {
     var levels: [SokobanData]!
     var currentIndex: Int! = 0
     
+    @IBAction func tapLoad(_ sender: UIButton) {
+        
+        if savedLevels.count > currentIndex {
+            self.performSegue(withIdentifier: "savesToGame", sender: self)
+        }
+    }
+    
     @IBAction func tapDelete(_ sender: UIButton) {
         
-        print(currentIndex)
-        scrollView.subviews[currentIndex*2].removeFromSuperview()
-        scrollView.subviews[currentIndex*2].removeFromSuperview()
-        
-        savedLevels.remove(at: currentIndex)
-        
-        //сдвигает все следущие views влево на страницу
-        for (i, view) in scrollView.subviews.enumerated() {
-            if i >= currentIndex*2 {
-                view.center.x = view.center.x - scrollView.bounds.width
-            }
-        }
-        scrollView.contentSize = CGSize(width: CGFloat(savedLevels.count)*scrollView.bounds.width,
-                                        height: scrollView.bounds.height)
-        //print(scrollView.subviews)
-        //print(currentIndex)
-        var saves = NSKeyedUnarchiver.unarchiveObject(withFile: SokobanData.getLevelPath(name: "saves")) as? [String]
-        
-        if saves != nil {
-            saves!.remove(at: currentIndex)
+        if savedLevels.count > 0 {
+            print("Current index = \(currentIndex)")
+            scrollView.subviews[currentIndex*2].removeFromSuperview()
+            scrollView.subviews[currentIndex*2].removeFromSuperview()
             
-            let isSuccessfulSave =
-                NSKeyedArchiver.archiveRootObject(saves!, toFile: SokobanData.getLevelPath(name: "saves"))
-            if isSuccessfulSave == true {
-                print("deleted save")
+            savedLevels.remove(at: currentIndex)
+            
+            //сдвигает все следущие views влево на страницу
+            for (i, view) in scrollView.subviews.enumerated() {
+                if i >= currentIndex*2 {
+                    view.center.x = view.center.x - scrollView.bounds.width
+                }
             }
+            scrollView.contentSize = CGSize(width: CGFloat(savedLevels.count)*scrollView.bounds.width,
+                                            height: scrollView.bounds.height)
 
+            var saves = NSKeyedUnarchiver.unarchiveObject(withFile: SokobanData.getLevelPath(name: "saves")) as? [String]
+            
+            if saves != nil {
+                if saves!.count > currentIndex {
+                    saves!.remove(at: currentIndex)
+                    let isSuccessfulSave =
+                        NSKeyedArchiver.archiveRootObject(saves!, toFile: SokobanData.getLevelPath(name: "saves"))
+                    if isSuccessfulSave == true {
+                        print("deleted save")
+                    }
+                }
+            }
         }
     }
     
@@ -106,8 +115,6 @@ class SavesViewController: UIViewController, UIScrollViewDelegate {
         }
         
         updateScrollView(levels: savedLevels)
-        
-        
     }
     
     
@@ -135,7 +142,7 @@ class SavesViewController: UIViewController, UIScrollViewDelegate {
     // MARK: Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if playButton === sender as? UIButton {
+        if segue.identifier == "savesToGame" {
             print(segue.identifier!)
             print("index:",currentIndex)
             print("sending saved level with name \(savedLevels[currentIndex].name)")
@@ -147,13 +154,4 @@ class SavesViewController: UIViewController, UIScrollViewDelegate {
             }
         }
     }
-
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-
-
 }
